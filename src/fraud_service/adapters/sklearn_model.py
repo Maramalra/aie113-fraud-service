@@ -1,7 +1,7 @@
 """Adapter: everything that knows about scikit-learn and joblib lives here."""
 import json
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 import joblib
 import numpy as np

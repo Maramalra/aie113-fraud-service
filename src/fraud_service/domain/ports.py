@@ -1,5 +1,6 @@
 """What the domain needs from the outside world, described without naming any tool."""
-from typing import Protocol, Sequence
+from collections.abc import Sequence
+from typing import Protocol
 
 
 class FraudModel(Protocol):

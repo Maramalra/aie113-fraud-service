@@ -3,8 +3,8 @@
 Same steps and numbers as the notebook. Data tables (pandas) are used here because this job is
 about bulk data; the scikit-learn specifics stay in the adapter.
 """
-from datetime import datetime, timezone
-from typing import Callable
+from collections.abc import Callable
+from datetime import UTC, datetime
 
 import numpy as np
 import pandas as pd
@@ -61,7 +61,7 @@ def train(df: pd.DataFrame, settings: Settings, fit: Callable, score: Callable, 
     info = {
         "model_version": settings.model_version,
         "model_type": type(model).__name__,
-        "trained_on": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "trained_on": datetime.now(UTC).strftime("%Y-%m-%d"),
         "scikit_learn_version": sklearn.__version__,
         "features": FEATURES,
         "threshold": threshold,
