@@ -1,6 +1,6 @@
 # Project journal · سجل المشروع
 
-**Group · المجموعة:** _(names)_ — AI coding agent: Claude Code (Claude Opus 5.5)
+**Group · المجموعة:** _(names)_ — AI coding agent: _(which tool and model)_
 **Track · المسار:** fraud
 **Repository · المستودع:** _(link)_
 
