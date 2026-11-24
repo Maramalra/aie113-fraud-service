@@ -246,7 +246,9 @@ secret store → code: `SecretStr` → logs: masked. Never in git, never in the 
   logged by mistake (`oops token=**********`); only *block* decisions alert.
 - Running the service with a fake token: start-up log shows `'alert_webhook_token': SecretStr('**********')`;
   the token appears **0 times** in the log.
-- gitleaks in CI: SCAN_RESULT
+- gitleaks in CI (pull request #4): ✅ passed in 7 s — no secrets anywhere in the git history.
+- To do with the group (for the walkthrough): on a throw-away branch, commit a fake key and watch gitleaks (and
+  GitHub push protection) stop it; then delete the branch.
 
 **Incident plan (five lines)**
 1. Rotate: revoke the token and create a new one. 2. Replace it in the GitHub environment and the secret store; restart.
