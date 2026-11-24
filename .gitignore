@@ -1,0 +1,21 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# Downloads and trained models stay out of git (made by `make train`)
+data/
+artifacts/
+notebook/data/
+notebook/artifacts/
+
+# Secrets: never commit these
+.env
+*.agekey
+age-key.txt
+keys.txt
+*.egg-info/
