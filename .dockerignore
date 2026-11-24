@@ -1,0 +1,13 @@
+# Only what the build needs goes into the build context. Never secrets, data or local models.
+.git
+.venv
+data
+artifacts
+notebook
+tests
+**/__pycache__
+*.egg-info
+.env
+*.agekey
+age-key.txt
+keys.txt

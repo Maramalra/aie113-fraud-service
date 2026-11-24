@@ -14,3 +14,9 @@ test:
 
 serve:   ## start the API on http://localhost:8000 (docs at /docs)
 	$(PY) -m uvicorn fraud_service.entrypoints.api:app --port 8000
+
+image:   ## build the container image
+	docker build -t fraud-service:local .
+
+smoke:   ## start the image and check it answers
+	scripts/smoke_test.sh fraud-service:local
