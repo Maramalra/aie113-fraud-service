@@ -14,3 +14,9 @@ class FraudModel(Protocol):
     def score_many(self, rows: Sequence[dict[str, float]]) -> list[float]:
         """Fraud scores (0..1) for many input rows, each a {feature name: value} dict."""
         ...
+
+
+class AlertSender(Protocol):
+    """Tells the fraud team about a blocked payment."""
+
+    def send_block_alert(self, score: float, model_version: str, top_reason: str) -> None: ...

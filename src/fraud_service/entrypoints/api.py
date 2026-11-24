@@ -8,6 +8,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
+from fraud_service.adapters import log_masking
+from fraud_service.adapters.alerts import NoAlerts, WebhookAlertSender
 from fraud_service.config import Settings
 from fraud_service.domain.payment import V_NAMES, Payment
 from fraud_service.services.scoring import ScoringService
@@ -63,10 +65,20 @@ def error(status: int, code: str, message: str, details: list[dict] | None = Non
                                                                "details": details or []}})
 
 
+def make_alert_sender(settings: Settings):
+    if settings.alert_webhook_url and settings.alert_webhook_token:
+        return WebhookAlertSender(settings.alert_webhook_url, settings.alert_webhook_token)
+    return NoAlerts()
+
+
 # ---- The app ----------------------------------------------------------------------------------
 def create_app(settings: Settings | None = None, model=None) -> FastAPI:
     """`model` can be passed in (tests use a fake); otherwise the real one is loaded at start-up."""
     settings = settings or Settings()
+    token = settings.alert_webhook_token
+    log_masking.install([token.get_secret_value()] if token else [])
+    # What the service runs with. SecretStr prints as '**********', never the real token.
+    log.info("settings_effective %s", settings.model_dump(exclude={"thresholds_to_try"}))
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -76,7 +88,8 @@ def create_app(settings: Settings | None = None, model=None) -> FastAPI:
             if m is None:
                 from fraud_service.adapters.sklearn_model import SklearnFraudModel
                 m = SklearnFraudModel.load(settings.model_path, settings.info_path)
-            app.state.service = ScoringService(m, settings.block_threshold, settings.top_reasons)
+            app.state.service = ScoringService(m, settings.block_threshold, settings.top_reasons,
+                                               alerts=make_alert_sender(settings))
             log.info("model loaded: version %s", m.version)
         except Exception as exc:  # stay alive but not ready, so the problem is visible
             log.error("model could not be loaded: %s", type(exc).__name__)
