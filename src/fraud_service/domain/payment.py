@@ -29,7 +29,7 @@ class Payment:
 
     def features(self) -> dict[str, float]:
         """The model's inputs, built exactly as in training."""
-        values = dict(zip(V_NAMES, self.v))
+        values = dict(zip(V_NAMES, self.v, strict=True))
         values["Amount"] = self.amount
         values["hour"] = self.hour
         return {name: values[name] for name in FEATURE_NAMES}

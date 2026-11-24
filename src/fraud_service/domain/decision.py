@@ -1,8 +1,8 @@
 """The business rule: what to do with a fraud score."""
-from enum import Enum
+from enum import StrEnum
 
 
-class Decision(str, Enum):
+class Decision(StrEnum):
     ALLOW = "allow"    # let the payment through
     REVIEW = "review"  # send it to the fraud team with the reasons
     BLOCK = "block"    # stop it now, then the fraud team checks

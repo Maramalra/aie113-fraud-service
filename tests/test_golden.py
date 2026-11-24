@@ -16,5 +16,5 @@ def test_same_answers_as_notebook(real_model, case):
     assert result.score == pytest.approx(case["expected_score"], abs=1e-9)
     assert (result.score >= GOLDEN["threshold"]) == case["expected_alert"]
     assert [r.feature for r in result.reasons] == [r["feature"] for r in case["expected_top_reasons"]]
-    for got, want in zip(result.reasons, case["expected_top_reasons"]):
+    for got, want in zip(result.reasons, case["expected_top_reasons"], strict=True):
         assert got.score_if_typical == pytest.approx(want["score_if_typical"], abs=1e-9)

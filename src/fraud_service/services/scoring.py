@@ -17,7 +17,7 @@ def what_if_typical(model: FraudModel, features: dict[str, float]) -> tuple[floa
     base, new_scores = scores[0], scores[1:]
     reasons = [
         Reason(feature=name, value=features[name], typical=model.typical_values[name], score_if_typical=s)
-        for name, s in zip(model.feature_names, new_scores)
+        for name, s in zip(model.feature_names, new_scores, strict=True)
     ]
     # Stable sort by drop, like pandas sort_values in the notebook
     reasons.sort(key=lambda r: base - r.score_if_typical, reverse=True)

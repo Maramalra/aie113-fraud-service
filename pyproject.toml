@@ -17,3 +17,14 @@ pythonpath = ["src"]
 markers = [
   "model: needs the real trained model in artifacts/ (run `make train` first)",
 ]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]   # errors, pyflakes, import order, likely bugs, modern syntax
+ignore = ["E702"]                    # V1..V28 fields are listed several per line on purpose
+
+[tool.coverage.run]
+source = ["src/fraud_service"]
