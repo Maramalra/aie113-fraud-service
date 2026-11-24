@@ -1,0 +1,9 @@
+# Secret scanner settings: the default rules, plus one for our own alert token format.
+[extend]
+useDefault = true
+
+[[rules]]
+id = "fraud-alert-webhook-token"
+description = "Fraud alert webhook token"
+regex = '''fraudalert_[A-Za-z0-9]{32,}'''
+keywords = ["fraudalert_"]

@@ -1,8 +1,8 @@
 """Use case: score one payment, decide, and give the top reasons."""
 from fraud_service.domain.assessment import Assessment, Reason
-from fraud_service.domain.decision import decide
+from fraud_service.domain.decision import Decision, decide
 from fraud_service.domain.payment import Payment
-from fraud_service.domain.ports import FraudModel
+from fraud_service.domain.ports import AlertSender, FraudModel
 
 
 def what_if_typical(model: FraudModel, features: dict[str, float]) -> tuple[float, list[Reason]]:
@@ -25,16 +25,21 @@ def what_if_typical(model: FraudModel, features: dict[str, float]) -> tuple[floa
 
 
 class ScoringService:
-    def __init__(self, model: FraudModel, block_threshold: float, top_reasons: int = 3) -> None:
+    def __init__(self, model: FraudModel, block_threshold: float, top_reasons: int = 3,
+                 alerts: AlertSender | None = None) -> None:
         self.model = model
+        self.alerts = alerts
         self.block_threshold = block_threshold
         self.top_reasons = top_reasons
 
     def assess(self, payment: Payment) -> Assessment:
         score, reasons = what_if_typical(self.model, payment.features())
+        decision = decide(score, self.model.review_threshold, self.block_threshold)
+        if decision == Decision.BLOCK and self.alerts is not None:
+            self.alerts.send_block_alert(score, self.model.version, reasons[0].feature)
         return Assessment(
             score=score,
-            decision=decide(score, self.model.review_threshold, self.block_threshold),
+            decision=decision,
             review_threshold=self.model.review_threshold,
             block_threshold=self.block_threshold,
             model_version=self.model.version,

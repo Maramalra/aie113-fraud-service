@@ -32,8 +32,22 @@ jobs:
       - run: pip install ruff
       - run: ruff check src tests scripts
 
+  secret-scan:
+    # gitleaks looks through the WHOLE git history for anything that looks like a key or token.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        run: >
+          docker run --rm -v "$PWD:/repo"
+          ghcr.io/gitleaks/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
+          git /repo --redact --verbose --exit-code 1
+
   test:
-    needs: lint
+    needs: [lint, secret-scan]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

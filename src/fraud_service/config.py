@@ -1,11 +1,17 @@
 """All settings in one place. Override any of them with an environment variable FRAUD_<NAME>."""
 from pathlib import Path
 
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="FRAUD_", extra="forbid")
+    # Values come from FRAUD_* environment variables, or from files in /run/secrets
+    # (how Docker and Kubernetes hand secrets to a container).
+    model_config = SettingsConfigDict(
+        env_prefix="FRAUD_", extra="forbid",
+        secrets_dir="/run/secrets" if Path("/run/secrets").is_dir() else None,
+    )
 
     # Where things live
     data_url: str = "https://storage.googleapis.com/download.tensorflow.org/data/creditcard.csv"
@@ -26,3 +32,9 @@ class Settings(BaseSettings):
     # 0.9: on validation payments, 97% of alerts at 0.9 were real fraud (notebook table).
     block_threshold: float = 0.9
     top_reasons: int = 3
+
+    # Alerting webhook that notifies the fraud team when a payment is BLOCKED.
+    # The token is a SECRET: it comes from the environment (FRAUD_ALERT_WEBHOOK_TOKEN) or a mounted
+    # secret file, never from code. SecretStr prints as '**********', so it cannot leak by accident.
+    alert_webhook_url: str | None = None
+    alert_webhook_token: SecretStr | None = None
