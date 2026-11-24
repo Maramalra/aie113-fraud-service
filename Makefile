@@ -11,3 +11,6 @@ golden:  ## Stage 1 proof: the service gives the notebook's answers
 
 test:
 	$(PY) -m pytest -q
+
+serve:   ## start the API on http://localhost:8000 (docs at /docs)
+	$(PY) -m uvicorn fraud_service.entrypoints.api:app --port 8000

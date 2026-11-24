@@ -78,3 +78,36 @@ reasons are part of the job, so both live in the domain/services, not in the mod
 
 **Open questions**
 Is 0.9 the right "block" level? We chose it because 97% of validation alerts at 0.9 were real fraud.
+
+---
+
+## Stage 2: FastAPI endpoint · نقطة نهاية FastAPI
+
+**What we asked the agent**
+Design the request and response first; one safe error shape; health vs readiness; load the model once.
+
+**What it built**
+- `entrypoints/api.py` — `POST /v1/score`, `GET /health/live`, `GET /health/ready`, docs at `/docs`.
+  The contract (pydantic): `Time`, `Amount` (≥ 0), `V1`…`V28` all required numbers; unknown fields,
+  NaN/infinity rejected. The model is loaded once at start-up (lifespan). Decisions: allow < 0.4 ≤ review < 0.9 ≤ block.
+- `tests/test_api.py` + `tests/fakes.py` — API tests with a fake model (no real model needed, < 1 s).
+- `make serve`.
+
+**What we checked, and what we saw**
+Good request (the notebook's last-cell payment) →
+`{"score": 0.9989, "decision": "block", "review_threshold": 0.4, "block_threshold": 0.9,
+"reasons": [V14 → 0.149, V10 → 0.278, V4 → 0.983], ...}` — same as the notebook.
+Bad request (V14 missing, Amount −5, V1 "abc") →
+`422 {"error": {"code": "invalid_payment", "details": [{"field": "Amount", "problem": "Input should be greater than or equal to 0"}, {"field": "V1", ...}, {"field": "V14", "problem": "Field required"}]}}`
+— the values we sent are never echoed. A smuggled `card_number` field is rejected without echoing the number.
+Readiness checks that the model and its facts were loaded; with the model file missing, `/health/live` is
+200 but `/health/ready` is 503 and `/v1/score` answers `not_ready`.
+
+**What surprised us or went wrong**
+FastAPI's default error message repeats the input value back. We replaced it with our own error shape so
+private payment data never leaks into an error.
+
+**How we would explain this stage to a colleague**
+The API is the only door to our model. It checks every request against a contract and rejects bad ones
+with a clear, safe error. Live means "the process runs"; ready means "the model is loaded and can score".
+The URL has `/v1` so we can change the contract later without breaking current users.
