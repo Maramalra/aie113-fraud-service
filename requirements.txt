@@ -1,10 +1,10 @@
-# Exact versions (the workshop's pinned set) so every install is the same
+# What the service needs to run. Exact versions (the workshop's pinned set) so every build is the same.
 numpy==2.5.5
 pandas==3.1.1
 scikit-learn==1.9.1
+scipy==1.18.1
 joblib==1.6.0
+pydantic==2.14.4
 pydantic-settings==2.16.3
-pytest==9.2.0
-httpx==0.28.1
 fastapi==0.165.0
 uvicorn==0.54.0

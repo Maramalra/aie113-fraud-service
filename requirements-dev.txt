@@ -1,0 +1,6 @@
+# Extra tools for developers and the pipeline (not inside the image)
+-r requirements.txt
+pytest==9.2.0
+pytest-cov
+httpx==0.28.1
+ruff

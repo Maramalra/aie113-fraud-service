@@ -1,0 +1,12 @@
+# Start the service with one command:  docker compose up --build
+services:
+  api:
+    build: .
+    image: fraud-service:local
+    ports:
+      - "8000:8000"
+    environment:
+      FRAUD_BLOCK_THRESHOLD: "0.9"
+    restart: unless-stopped
+    read_only: true          # the container cannot change its own files
+    tmpfs: [/tmp]
