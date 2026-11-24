@@ -1,0 +1,19 @@
+[project]
+name = "fraud-service"
+version = "1.0.0"
+description = "SDA-AIE-113 fraud track: card-fraud scoring service with reasons"
+requires-python = ">=3.12"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+  "model: needs the real trained model in artifacts/ (run `make train` first)",
+]
