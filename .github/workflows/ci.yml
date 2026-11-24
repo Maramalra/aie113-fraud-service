@@ -72,7 +72,7 @@ jobs:
           load: true
           tags: fraud-service:ci
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=min,ignore-error=true   # cache is a speed-up only; never fail the build on it
       - name: Image size
         run: docker image ls fraud-service:ci
       - name: Smoke test (starts, healthy, not root, scores a payment)
